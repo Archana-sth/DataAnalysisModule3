@@ -39,7 +39,8 @@ From stores;
 -- Q7) From orders, show order_id, status, and a computed column total_items
 --     that counts how many items are in each order.
 select order_id, status
-from orders;
+from orders
+;
 
 -- Q8) Show orders placed on '2025-09-04' (any time that day).
 select *
