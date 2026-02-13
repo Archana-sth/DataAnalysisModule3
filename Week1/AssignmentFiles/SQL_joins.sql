@@ -40,23 +40,63 @@ order by o.order_datetime, o.order_id;
 --     For each order, show customer_name, store_name, order_datetime,
 --     order_total (= SUM(quantity * products.price) per order).
 select
-	c.name as customer_name,
+	concat(c. first_name, " ", c.last_name) as customer_name,
     s.name as store_name,
     o.order_datetime,
     sum(oi.quantity * p.price) as order_total
-from 
+from customers c
+join orders o 
+	on c.customer_id = o.customer_id
+join stores s 
+	on s.store_id = o.store_id
+join order_items oi
+	on oi.order_id = o.order_id
+join products p
+	on p.product_id = oi.product_id
+where o.status = 'paid'
+group by c.first_name, c.last_name, s.name, o.order_datetime
+;
 -- Q4) Left join to find customers who have never placed an order.
 --     Return first_name, last_name, city, state.
+select 
+	c.first_name,
+    c.Last_name,
+    c.city,
+    c.state
+from customers c
+left join orders o
+	on c.customer_id = o.customer_id
+where o.customer_id is null;
+
 
 -- Q5) For each store, list the top-selling product by units (PAID only).
 --     Return store_name, product_name, total_units.
 --     Hint: Use a window function (ROW_NUMBER PARTITION BY store) or a correlated subquery.
 
+
+
 -- Q6) Inventory check: show rows where on_hand < 12 in any store.
 --     Return store_name, product_name, on_hand.
+select 
+	s.name as store_name,
+    p.name as product_name,
+    i.on_hand 
+from stores s
+join inventory i
+	on s.store_id = i.store_id
+join products p
+	on p.product_id = i.product_id
+where on_hand < 12;
+    
+    
 
 -- Q7) Manager roster: list each store's manager_name and hire_date.
 --     (Assume title = 'Manager').
+select
+	concat(first_name, " ", last_name) as manager_name,
+    hire_date
+from employees
+where title = 'manager';
 
 -- Q8) Using a subquery/CTE: list products whose total PAID revenue is above
 --     the average PAID product revenue. Return product_name, total_revenue.
