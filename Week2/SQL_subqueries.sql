@@ -70,3 +70,26 @@ where product_id not in(
 --     average total_units_sold across all products.
 --     Return product_id, product_name, total_units_sold.
 
+select 
+	dt.product_id, 
+	p.name as product_name,
+	dt.total_units_sold
+ from(
+	select 
+		product_id,
+		sum(quantity) as total_units_sold
+		from order_items
+		group by product_id
+	)dt
+join products p
+	on p.product_id= dt.product_id
+where dt.total_units_sold > (
+	select avg(total_units_sold)
+    from (
+		select sum(quantity) as total_units_sold
+        from order_items
+        group by product_id
+        ) avg_dt
+);
+			
+   
